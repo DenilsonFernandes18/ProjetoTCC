@@ -41,9 +41,9 @@ function atualizarSensores() {
     .catch(err => console.error('Erro ao buscar dados:', err));
 }
 
-// Atualiza imediatamente e depois a cada 3 segundos
+// Atualiza imediatamente e depois a cada 1 segundos
 atualizarSensores();
-setInterval(atualizarSensores, 3000);
+setInterval(atualizarSensores, 2000);
 
 //Modal
 document.getElementById("btnAbrirHistorico").addEventListener("click", () => {
@@ -64,7 +64,6 @@ window.onclick = (event) => {
     modal.style.display = "none";
   }
 };
-
 
 
 //Irrigação modo automático
@@ -99,24 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // Atualiza e salva sempre que mudar
 modoAutoCheckbox.addEventListener('change', atualizarModoAutomatico);
 
-document.addEventListener('DOMContentLoaded', () => {
-  const estadoSalvo = localStorage.getItem('modoAutomatico');
-
-  // Evita a transição no carregamento inicial
-  const switchWrapper = document.querySelector('.switch');
-  switchWrapper.classList.remove('transition');
-
-  if (estadoSalvo !== null) {
-    modoAutoCheckbox.checked = (estadoSalvo === 'true');
-  }
-
-  atualizarModoAutomatico();
-
-  // Após um curto tempo, ativa a transição normalmente
-  setTimeout(() => {
-    switchWrapper.classList.add('transition');
-  }, 100); // 100ms é o suficiente para evitar a animação no carregamento
-});
 
 
 

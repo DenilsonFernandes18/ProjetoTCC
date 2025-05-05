@@ -15,7 +15,7 @@
     if ($result->num_rows > 0) {
     echo json_encode($result->fetch_assoc());
     } else {
-    echo json_encode(["temperatura" => "N/A", "humidade" => "N/A"]);
+        echo json_encode(["temperatura" => null, "umidade" => null]);
     }
     
 ?>

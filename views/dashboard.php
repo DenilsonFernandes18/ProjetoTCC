@@ -8,22 +8,14 @@
     </head>
     
     <body>
-        <div style="display: flex; gap: 8px;">
-            <span>Bem-Vindo(a)</span>
-            <p class="user">Denilson</p>
-            <a href="logout.php" style="position: absolute; top: 10px; right: 35px; text-decoration: none; background: red; color: white; padding: 5px 10px; border-radius: 5px;">
-                Sair
-            </a>
-        </div>
         <!--Inicio Dashboard-->
         <div class="dashboard">
             <h1>Painel de Monitoramento</h1>
             <div class="card-container">
-                <div class="card" id="tempCard">
-                    🌡️ Temperatura: <p id="temp">--</p>
-                    <small id="sensacaoTemp">Sensação: --</small>
+                <div class="card" id="tempCard">🌡️ Temperatura: <span id="temp" class="valor">--</span>
+                    <br><small id="sensacaoTemp">Sensação: --</small>
                 </div>
-                <div class="card" id="umiCard">💧 Humidade do Solo: <span id="umi">--</span></div>
+                <div class="card" id="umiCard">💧 Humidade do Solo: <span id="umi" class="valor">--</span></div>
                 <div class="card">🌱 Modo Automático: <span id="modoAutoTexto"></span></div>
             </div>
             <!-- Botão para abrir a modal -->
@@ -79,7 +71,8 @@
                 <button onclick="closeModal()" class="btnClose">Fechar</button>
             </div>
         </div>
-        
+        <script src="../js/scriptfirebase.js" type="module"></script>
+        <script src="../js/ajax.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="../js/script.js"></script>
         <script src="../js/swal.js"></script>
