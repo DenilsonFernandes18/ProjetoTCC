@@ -6,17 +6,21 @@
         <link rel="stylesheet" href="../css/style.css">
         <link rel="icon" href="../img/smartagro.png">
     </head>
-    
     <body>
         <!--Inicio Dashboard-->
         <div class="dashboard">
             <h1>Painel de Monitoramento</h1>
             <div class="card-container">
-                <div class="card" id="tempCard">🌡️ Temperatura: <span id="temp" class="valor">--</span>
-                    <br><small id="sensacaoTemp">Sensação: --</small>
+                <div class="card" id="tempCard">🌡️ Temperatura: 
+                    <p id="temp" class="valor">--</p>
+                    <small id="sensacaoTemp">Sensação: --</small>
                 </div>
-                <div class="card" id="umiCard">💧 Humidade do Solo: <span id="umi" class="valor">--</span></div>
-                <div class="card">🌱 Modo Automático: <span id="modoAutoTexto"></span></div>
+                <div class="card" id="umiCard">💧 Humidade do Solo: 
+                    <p id="umi" class="valor">--</p>
+                </div>
+                <div class="card">🌱 Modo Automático: 
+                    <p id="modoAutoTexto"></p>
+                </div>
             </div>
             <!-- Botão para abrir a modal -->
             <div class="nav">
@@ -50,22 +54,12 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Data/Hora</th>
-                            <th>Ação</th>
-                            <th>Status</th>
+                            <th>🕒Data/Hora</th>
+                            <th>⚙️Ação</th>
+                            <th>💡Status</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>10/04 08:00</td>
-                            <td>Início</td>
-                            <td>Sucesso</td>
-                        </tr>
-                        <tr>
-                            <td>10/04 08:10</td>
-                            <td>Parada</td>
-                            <td>Sucesso</td>
-                        </tr>
+                    <tbody id="Historico">
                     </tbody>
                 </table>
                 <button onclick="closeModal()" class="btnClose">Fechar</button>
@@ -73,6 +67,7 @@
         </div>
         <script src="../js/scriptfirebase.js" type="module"></script>
         <script src="../js/ajax.js"></script>
+        <script src="../js/ajaxHistorico.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="../js/script.js"></script>
         <script src="../js/swal.js"></script>

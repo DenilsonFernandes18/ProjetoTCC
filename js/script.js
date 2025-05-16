@@ -1,5 +1,5 @@
 function atualizarSensores() {
-  fetch('../db/conexao.php')
+  fetch('../db/dados.php')
     .then(res => res.json())
     .then(data => {
       const temperatura = data.temperatura;
