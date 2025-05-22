@@ -1,3 +1,8 @@
+<?php
+require_once 'proteger.php';
+?>
+
+
 <!DOCTYPE html>
 <html lang="pt">
     <head>
@@ -7,6 +12,14 @@
         <link rel="icon" href="../img/smartagro.png">
     </head>
     <body>
+        <div style="display: flex;" class="top-bar">
+            <div class="user">
+                <h4>Bem-vindo, <span style="color:rgb(44, 111, 64)"><?php echo $_SESSION['usuario_nome']; ?>!</span></h4>
+            </div>
+            <div class="sair">
+                <a href="logout.php">Sair</a>
+            </div>
+        </div>
         <!--Inicio Dashboard-->
         <div class="dashboard">
             <h1>Painel de Monitoramento</h1>
@@ -65,12 +78,24 @@
                 <button onclick="closeModal()" class="btnClose">Fechar</button>
             </div>
         </div>
-        <script src="../js/scriptfirebase.js" type="module"></script>
+        <script src="../js/status.js"></script>
         <script src="../js/ajax.js"></script>
         <script src="../js/ajaxHistorico.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="../js/script.js"></script>
         <script src="../js/swal.js"></script>
+        <?php if (isset($_SESSION['login_success'])): ?>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login realizado com sucesso!',
+                    showConfirmButton: false,
+                    timer: 2500
+                });
+            </script>
+            <?php unset($_SESSION['login_success']); ?>
+        <?php endif; ?>
+
     </body>
 </html>
 

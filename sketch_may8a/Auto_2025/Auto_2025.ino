@@ -92,6 +92,16 @@ void setup() {
   lcd.setCursor(0, 0);
   lcd.print("WiFi conectado");
   delay(2000);
+
+  // Envia "WiFi conectado" para o servidor
+  if (WiFi.status() == WL_CONNECTED) {
+  HTTPClient httpStatus;
+  httpStatus.begin("http://192.168.1.232/SmartAgro/db/salvar_dados.php");
+  httpStatus.addHeader("Content-Type", "application/x-www-form-urlencoded");
+  httpStatus.POST("status=WiFi conectado");
+  httpStatus.end();
+  }
+
 }
 
 void loop() {
@@ -137,6 +147,14 @@ void loop() {
     http.end();
   } else {
     Serial.println("WiFi desconectado");
+
+    // Envia "WiFi desconectado" para o servidor
+    HTTPClient httpStatus;
+    httpStatus.begin("http://192.168.1.232/SmartAgro/db/salvar_dados.php");
+    httpStatus.addHeader("Content-Type", "application/x-www-form-urlencoded");
+    httpStatus.POST("status=WiFi desconectado");
+    httpStatus.end();
+
   }
 
   delay(2000); // Espera 2 segundos antes da próxima leitura
