@@ -25,6 +25,7 @@ function iniciarIrrigacao() {
         icon: 'success',
         title: 'Irrigação iniciada!',
         showConfirmButton: false,
+        timerProgressBar: true,
         timer: 1500
     });
 }
@@ -34,6 +35,7 @@ function pararIrrigacao() {
         icon: 'error',
         title: 'Irrigação parada!',
         showConfirmButton: false,
+        timerProgressBar: true,
         timer: 1500
     });
 }

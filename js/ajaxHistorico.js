@@ -24,9 +24,9 @@ function carregarHistorico() {
         })
         .catch(error => console.error("Erro ao carregar histórico:", error));
 }
-
 // Atualiza a cada 2 segundos 
 setInterval(carregarHistorico, 2000);
 
 // Carrega o histórico quando a modal for aberta
 document.getElementById("btnAbrirHistorico").addEventListener("click", carregarHistorico);
+

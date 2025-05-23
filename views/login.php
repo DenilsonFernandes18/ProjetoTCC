@@ -1,44 +1,43 @@
 <?php
-session_start();
+  session_start();
+  
+  if (isset($_SESSION['usuario_id'])) {
+      header("Location: dashboard.php");
+      exit;
+  }
 
-if (isset($_SESSION['usuario_id'])) {
-    header("Location: dashboard.php");
-    exit;
-}
+  require_once '../db/conexao.php';
 
-require_once '../db/conexao.php';
+  if ($_SERVER["REQUEST_METHOD"] == "POST") {
+      $login = $_POST["login"];
+      $senha = $_POST["senha"];
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $login = $_POST["login"];
-    $senha = $_POST["senha"];
+      $sql = "SELECT * FROM usuarios WHERE email = ? OR telefone = ?";
+      $stmt = $con->prepare($sql);
+      $stmt->bind_param("ss", $login, $login);
+      $stmt->execute();
+      $resultado = $stmt->get_result();
 
-    $sql = "SELECT * FROM usuarios WHERE email = ? OR telefone = ?";
-    $stmt = $con->prepare($sql);
-    $stmt->bind_param("ss", $login, $login);
-    $stmt->execute();
-    $resultado = $stmt->get_result();
+      if ($resultado->num_rows === 1) {
+          $usuario = $resultado->fetch_assoc();
 
-    if ($resultado->num_rows === 1) {
-        $usuario = $resultado->fetch_assoc();
-
-        if (password_verify($senha, $usuario['senha'])) {
-            $_SESSION['usuario_id'] = $usuario['id'];
-            $_SESSION['usuario_nome'] = $usuario['nome'];
-            $_SESSION['login_success'] = true;
-            header("Location: dashboard.php");
-            exit;
-        } else {
-            // Senha incorreta
-            $_SESSION['login_error'] = "Usuário ou Senha incorretos!";
-        }
-    } else {
-        // Usuário não encontrado
-        $_SESSION['login_error'] = "Usuário ou Senha incorretos!";
-    }
-}
+          if (password_verify($senha, $usuario['senha'])) {
+              $_SESSION['usuario_id'] = $usuario['id'];
+              $_SESSION['usuario_nome'] = $usuario['nome'];
+              $_SESSION['login_success'] = true;
+              header("Location: dashboard.php");
+              exit;
+          } else {
+              // Senha incorreta
+              $_SESSION['login_error'] = "Usuário ou Senha incorretos!";
+          }
+      } else {
+          // Usuário não encontrado
+          $_SESSION['login_error'] = "Usuário ou Senha incorretos!";
+      }
+  }
 
 ?>
-
 
 <!DOCTYPE html>
 <html lang="pt">
@@ -52,7 +51,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <body>
       <div class="center">
         <h2>Login</h2>
-        
         <form method="post" action="login.php">
           <div class="txt_field">
             <input type="text" name="login" required>
@@ -64,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <span></span>
             <label for="">Senha</label>
           </div>
-          <div class="pass">Esqueceu a senha?</div>
+          <div class="pass"><a href="altersenha.php">Esqueceu a senha?</a></div>
           <input type="submit" value="Entrar">
           <div class="signup_link">
             Já possui uma conta?<a href="criar_usuario.php">Criar conta</a>
@@ -83,6 +81,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </script>
         <?php unset($_SESSION['login_error']); ?>
       <?php endif; ?>
-
+    
   </body>
 </html>
