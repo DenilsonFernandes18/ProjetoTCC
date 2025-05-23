@@ -2,7 +2,6 @@
 require_once 'proteger.php';
 ?>
 
-
 <!DOCTYPE html>
 <html lang="pt">
     <head>
@@ -11,18 +10,20 @@ require_once 'proteger.php';
         <link rel="stylesheet" href="../css/style.css">
         <link rel="icon" href="../img/smartagro.png">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+        
     </head>
-    <body onload="carregarHistorico()">
+    <body>
         <div style="display: flex;" class="top-bar">
-            <div class="user">
-                <h4>Bem-vindo, <span style="color:rgb(44, 111, 64)"><?php echo $_SESSION['usuario_nome']; ?>!</span></h4>
-            </div>
             <div class="sair">
-                <a href="logout.php">Sair</a>
+                <a href="#" id="btnAbrirEditar">Editar Dados</a>
+                <span><a href="logout.php">Sair</a></span>
             </div>
         </div>
         <!--Inicio Dashboard-->
         <div class="dashboard">
+            <div class="user">
+                <h4>Bem-vindo, <span style="color:rgb(44, 111, 64)"><?php echo $_SESSION['usuario_nome']; ?>!</span></h4>
+            </div>
             <h1>Painel de Monitoramento</h1>
             <div class="card-container">
                 <div class="card" id="tempCard">🌡️ Temperatura: 
@@ -45,8 +46,8 @@ require_once 'proteger.php';
         <!--Inicio Controle-->
         <div class="controle">
             <h1>Controle de Irrigação</h1>
-            <button id="ligar" onclick="iniciarIrrigacao() " class="on">Ligar(ON)</button>
-            <button id="desligar" onclick="pararIrrigacao() " class="off">Desligar(OFF)</button>
+            <button id="ligar" onclick="iniciarIrrigacao()" class="on">Ligar(ON)</button>
+            <button id="desligar" onclick="pararIrrigacao()" class="off">Desligar(OFF)</button>
             <div class="switch-container">
                 <span class="switch-label">Modo Automático</span>
                 <label class="switch">
@@ -57,7 +58,8 @@ require_once 'proteger.php';
         </div>
         
         <!--Fim Controle-->
-        <!-- Modal -->
+
+        <!-- Modal Histórico -->
         <div id="modalHistorico" class="modal">
             <div class="modal-conteudo">
                 <span class="fechar" id="btnFecharModal">&times;</span>
@@ -77,11 +79,48 @@ require_once 'proteger.php';
                 <button onclick="closeModal()" class="btnClose">Fechar</button>
             </div>
         </div>
+
+        <!-- Modal de edição -->
+        <div id="modalEditar" class="modal">
+            <div class="modal-conteudo">
+                <span class="fechar" onclick="document.getElementById('modalEditar').style.display='none'">&times;</span>
+                <h2>Editar Dados</h2>
+                <table>
+                <tr>
+                    <td><i style="cursor:pointer" class="bi bi-pencil-square" onclick="abrirSubModal('nome')"></i></td>
+                    <td>Nome</td>
+                    <td><?php echo $_SESSION['usuario_nome']; ?></td>
+                </tr>
+                <tr>
+                    <td><i style="cursor:pointer"  class="bi bi-pencil-square" onclick="abrirSubModal('email')"></i></td>
+                    <td>Email</td>
+                    <td><?php echo $_SESSION['usuario_email']; ?></td>
+                </tr>
+                <tr>
+                    <td><i style="cursor:pointer"  class="bi bi-pencil-square" onclick="abrirSubModal('telefone')"></i></td>
+                    <td>Telefone</td>
+                    <td><?php echo $_SESSION['usuario_telefone']; ?></td>
+                </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Submodal de edição individual -->
+        <div id="modalCampo" class="modal">
+            <div class="modal-conteudo">
+                <span class="fechar" onclick="document.getElementById('modalCampo').style.display='none'">&times;</span>
+                <h3 id="tituloCampo"></h3>
+                <input type="text" id="novoValor" />
+                <button onclick="salvarEdicao()">Salvar</button>
+            </div>
+        </div>
+
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="../js/ajax.js"></script>
         <script src="../js/ajaxHistorico.js"></script>
         <script src="../js/script.js"></script>
         <script src="../js/swal.js"></script>
+
         <?php if (isset($_SESSION['login_success'])): ?>
             <script>
                 Swal.fire({
@@ -93,13 +132,53 @@ require_once 'proteger.php';
             </script>
             <?php unset($_SESSION['login_success']); ?>
         <?php endif; ?>
+        <!--Script para as modais-->
         <script>
+            // Abrir modal editar
+            document.getElementById('btnAbrirEditar').addEventListener('click', () => {
+                document.getElementById('modalEditar').style.display = 'block';
+            });
+
+            // Abrir submodal para campo individual
+            function abrirSubModal(campo) {
+                campoAtual = campo;
+                document.getElementById('tituloCampo').innerText = 'Atualizar ' + campo.charAt(0).toUpperCase() + campo.slice(1);
+                document.getElementById('modalCampo').style.display = 'block';
+            }
+
+            // Salvar edição
+            function salvarEdicao() {
+                const valor = document.getElementById('novoValor').value;
+
+                fetch('../db/atualizar_dados.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `campo=${campoAtual}&valor=${encodeURIComponent(valor)}`
+                })
+                .then(res => res.text())
+                .then(msg => {
+                    alert(msg);
+                    location.reload(); // Atualiza a página para refletir os dados
+                });
+            }
+
+            // Fechar modais ao clicar fora delas
+            window.onclick = function(event) {
+                const modais = document.querySelectorAll('.modal');
+                modais.forEach(modal => {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            }
+
+            // Registrar ações ligar e desligar
             document.getElementById('ligar').addEventListener('click', function () {
-                registrarAcao('ligada'); // Sempre envia 'manual'
+                registrarAcao('ligada');
             });
 
             document.getElementById('desligar').addEventListener('click', function () {
-                registrarAcao('desligada'); // Sempre envia 'manual'
+                registrarAcao('desligada'); 
             });
 
             function registrarAcao(status) {
@@ -113,18 +192,15 @@ require_once 'proteger.php';
                 .then(response => response.text())
                 .then(data => {
                     console.log("Resposta do servidor:", data);
-                    
                 })
                 .catch(error => {
                     console.error("Erro ao registrar ação:", error);
                 });
             }
-        </script>
-        <script>
+
+            // Loop para registrar modo automático
             setInterval(() => {
                 const modoAuto = document.getElementById('modoAuto').checked;
-
-                // Substitua por valores reais que você já possui (via sensores ou Ajax)
                 const temperatura = parseFloat(document.getElementById('temp').textContent);
                 const umidade = parseFloat(document.getElementById('umi').textContent);
 
@@ -144,10 +220,9 @@ require_once 'proteger.php';
                         console.error("Erro automático:", error);
                     });
                 }
-            }, 10000); // Verifica a cada 10 segundos
-
+            }, 10000); // a cada 10 segundos
         </script>
-
     </body>
 </html>
+
 

@@ -24,6 +24,8 @@
           if (password_verify($senha, $usuario['senha'])) {
               $_SESSION['usuario_id'] = $usuario['id'];
               $_SESSION['usuario_nome'] = $usuario['nome'];
+              $_SESSION['usuario_email'] = $usuario['email'];
+              $_SESSION['usuario_telefone'] = $usuario['telefone'];
               $_SESSION['login_success'] = true;
               header("Location: dashboard.php");
               exit;
@@ -43,7 +45,7 @@
 <html lang="pt">
   <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <title>Login-SmartAgro</title>
     <link rel="stylesheet" href="../css/style_login.css">
     <link rel="icon" href="../img/smartagro.png">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
@@ -55,7 +57,7 @@
           <div class="txt_field">
             <input type="text" name="login" required>
             <span></span>
-            <label for="">Email ou Telefone</label>
+            <label for="">E-mail ou Telefone</label>
           </div>
           <div class="txt_field">
             <input type="password" name="senha" required>
@@ -65,7 +67,7 @@
           <div class="pass"><a href="altersenha.php">Esqueceu a senha?</a></div>
           <input type="submit" value="Entrar">
           <div class="signup_link">
-            Já possui uma conta?<a href="criar_usuario.php">Criar conta</a>
+            Não tem uma conta?<a href="criar_usuario.php">Criar conta</a>
           </div>
         </form>
       </div>
@@ -81,6 +83,5 @@
         </script>
         <?php unset($_SESSION['login_error']); ?>
       <?php endif; ?>
-    
   </body>
 </html>
