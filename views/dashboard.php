@@ -110,7 +110,7 @@ require_once 'proteger.php';
             <div class="modal-conteudo">
                 <span class="fechar" onclick="document.getElementById('modalCampo').style.display='none'">&times;</span>
                 <h3 id="tituloCampo"></h3>
-                <input type="text" id="novoValor" />
+                <input type="text" pattern="\d{9}" title="Insira exatamente 9 dígitos" maxlength="9" id="novoValor" />
                 <button onclick="salvarEdicao()">Salvar</button>
             </div>
         </div>
@@ -130,7 +130,7 @@ require_once 'proteger.php';
                     timer: 2500
                 });
             </script>
-            <?php unset($_SESSION['login_success']); ?>
+        <?php unset($_SESSION['login_success']); ?>
         <?php endif; ?>
         <!--Script para as modais-->
         <script>
@@ -157,7 +157,7 @@ require_once 'proteger.php';
                 })
                 .then(res => res.text())
                 .then(msg => {
-                    alert(msg);
+                    alert("Não é possível, número existente");
                     location.reload(); // Atualiza a página para refletir os dados
                 });
             }

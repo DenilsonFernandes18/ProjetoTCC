@@ -65,6 +65,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <span></span>
             <label for="">Email</label>
           </div>
+          <div class="txt_field">
+            <input type="text" name="telefone" pattern="\d{9}" title="Insira exatamente 9 dígitos" maxlength="9" required>
+            <span></span>
+            <label for="">Telefone</label>
+          </div>
           <div class="txt_field ">
             <select name="genero" required>
               <option value="" disabled selected hidden>Selecione o gênero</option>
