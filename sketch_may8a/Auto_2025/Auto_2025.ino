@@ -60,6 +60,8 @@ void loop() {
 //Dados da sua rede Wi-Fi
 const char* ssid = "ZAP-Guadalupe";
 const char* password = "@Guadalupe2024";
+const char* api_token = "216358ab6c125bf25090a6db185c86007cfa333a305672797762f6ba37f4ad3c";
+
 
 // Endereço do servidor local
 const char* serverName = "http://192.168.1.232/SmartAgro/db/salvar_dados.php";
@@ -132,7 +134,8 @@ void loop() {
     http.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
     // Montar os dados para enviar
-    String dados = "temperatura=" + String(tempC, 2) + "&umidade=" + String(porcentagem);
+    String dados = "temperatura=" + String(tempC, 2) + "&umidade=" + String(porcentagem) + "&token="   + String(api_token);
+
 
     int httpResponseCode = http.POST(dados);
 

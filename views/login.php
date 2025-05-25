@@ -26,6 +26,7 @@
               $_SESSION['usuario_nome'] = $usuario['nome'];
               $_SESSION['usuario_email'] = $usuario['email'];
               $_SESSION['usuario_telefone'] = $usuario['telefone'];
+
               $_SESSION['login_success'] = true;
               header("Location: login_success.php");
               exit;
