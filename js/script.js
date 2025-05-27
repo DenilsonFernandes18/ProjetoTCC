@@ -9,37 +9,50 @@ function atualizarSensores() {
       const umidEl = document.getElementById('umi');
       const sensacaoTempEl = document.getElementById('sensacaoTemp');
 
-      // Atualiza valores
-      tempEl.textContent = `${temperatura}°C`;
-      umidEl.textContent = `${umidade}%`;
-
       // Limpa classes antigas
-      tempEl.classList.remove('vermelho', 'verde', 'laranja');
-      umidEl.classList.remove('vermelho', 'verde', 'laranja');
+      tempEl.classList.remove('vermelho', 'verde', 'laranja', 'preto');
+      umidEl.classList.remove('vermelho', 'verde', 'laranja', 'preto');
 
-      // Aplica cor à temperatura
-      if (temperatura > 35) {
-        tempEl.classList.add('vermelho');
-        sensacaoTempEl.textContent = 'Sensação: Muito quente';
-      } else if (temperatura < 15) {
-        tempEl.classList.add('verde');
-        sensacaoTempEl.textContent = 'Sensação: Frio';
+      // Atualiza valores e cor da temperatura
+      if (temperatura === "--") {
+        tempEl.textContent = "--";
+        tempEl.classList.add('preto');
+        sensacaoTempEl.textContent = '';
       } else {
-        tempEl.classList.add('verde');
-        sensacaoTempEl.textContent = 'Sensação: Agradável';
+        tempEl.textContent = `${temperatura}°C`;
+
+        if (temperatura > 35) {
+          tempEl.classList.add('vermelho');
+          sensacaoTempEl.textContent = 'Sensação: Muito quente';
+        } else if (temperatura < 15) {
+          tempEl.classList.add('verde');
+          sensacaoTempEl.textContent = 'Sensação: Frio';
+        } else {
+          tempEl.classList.add('verde');
+          sensacaoTempEl.textContent = 'Sensação: Agradável';
+        }
       }
 
-      // Aplica cor à umidade
-      if (umidade < 30) {
-        umidEl.classList.add('vermelho');
-      } else if (umidade <= 60) {
-        umidEl.classList.add('verde');
+      // Atualiza valores e cor da umidade
+      if (umidade === "--") {
+        umidEl.textContent = "--";
+        umidEl.classList.add('preto');
       } else {
-        umidEl.classList.add('laranja');
+        umidEl.textContent = `${umidade}%`;
+
+        if (umidade < 30) {
+          umidEl.classList.add('vermelho');
+        } else if (umidade <= 60) {
+          umidEl.classList.add('verde');
+        } else {
+          umidEl.classList.add('laranja');
+        }
       }
     })
     .catch(err => console.error('Erro ao buscar dados:', err));
 }
+
+
 
 // Atualiza imediatamente e depois a cada 1 segundos
 atualizarSensores();

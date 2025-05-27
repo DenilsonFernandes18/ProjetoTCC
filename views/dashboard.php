@@ -220,7 +220,7 @@ require_once 'proteger.php';
                         console.error("Erro automático:", error);
                     });
                 }
-            }, 10000); // a cada 10 segundos
+            }, 8000); // a cada 10 segundos
         </script>
     </body>
 </html>

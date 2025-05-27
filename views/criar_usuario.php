@@ -19,9 +19,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $genero = $_POST['genero'];
     $senha = $_POST['senha'];
 
-    // Gera o token único de 64 caracteres
-    $api_token = bin2hex(random_bytes(32));
-
     // Verifica se o e-mail ou telefone já existem
     $verifica = $con->prepare("SELECT id FROM usuarios WHERE email = ? OR telefone = ?");
     $verifica->bind_param("ss", $email, $telefone);
@@ -32,12 +29,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['criar_error'] = "E-mail ou telefone já cadastrado!";
     } else {
         $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-        $stmt = $con->prepare("INSERT INTO usuarios (nome, email, telefone, genero, senha, api_token)VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssss", $nome, $email, $telefone, $genero, $senha_hash, $api_token);
+        $stmt = $con->prepare("INSERT INTO usuarios (nome, email, telefone, genero, senha)VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssss", $nome, $email, $telefone, $genero, $senha_hash);
 
         if ($stmt->execute()) {
             $_SESSION['criar_sucesso'] = "Conta criada com sucesso!";
-            $_SESSION['api_token']     = $api_token; 
         } else {
             $_SESSION['criar_error'] = "Erro ao criar usuário.";
         }
@@ -99,11 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           
         </form>
       </div>
-      <?php if (isset($_SESSION['api_token'])): ?>
-        <div class="token-info">
-          Seu API Token: <code><?= $_SESSION['api_token'] ?></code>
-        </div>
-      <?php endif; ?>
+      
 
       <?php include '../alertas/alertas.php'; ?>
 

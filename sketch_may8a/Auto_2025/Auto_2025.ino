@@ -47,6 +47,7 @@ void loop() {
   delay(2000);
 }
 */
+
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <OneWire.h>
@@ -60,7 +61,7 @@ void loop() {
 //Dados da sua rede Wi-Fi
 const char* ssid = "ZAP-Guadalupe";
 const char* password = "@Guadalupe2024";
-const char* api_token = "216358ab6c125bf25090a6db185c86007cfa333a305672797762f6ba37f4ad3c";
+
 
 
 // Endereço do servidor local
@@ -134,7 +135,7 @@ void loop() {
     http.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
     // Montar os dados para enviar
-    String dados = "temperatura=" + String(tempC, 2) + "&umidade=" + String(porcentagem) + "&token="   + String(api_token);
+    String dados = "temperatura=" + String(tempC, 2) + "&umidade=" + String(porcentagem) 
 
 
     int httpResponseCode = http.POST(dados);
@@ -162,7 +163,5 @@ void loop() {
 
   delay(2000); // Espera 2 segundos antes da próxima leitura
 }
-
-
 
 
