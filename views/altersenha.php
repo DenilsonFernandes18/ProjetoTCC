@@ -52,14 +52,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <h2>Alterar Senha</h2>
           <form method="post" action="altersenha.php">
             <div class="txt_field">
-              <input type="text" name="login" required>
+              <input type="text" name="login" required autocomplete="username">
               <span></span>
-              <label for="">E-mail ou Telefone</label>
+              <label>E-mail ou Telefone</label>
             </div>
             <div class="txt_field">
-              <input type="password" name="senha" required>
+              <input type="password" name="senha" required autocomplete="new-password">
               <span></span>
-              <label for="">Nova senha</label>
+              <label>Nova Senha</label>
             </div>
             <div class="signup_link">
               <a href="login.php">Entrar na minha conta</a>

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'conexao.php'; // define $con
+require_once 'conexao.php';
 
 // Verifica sessão
 if (!isset($_SESSION['usuario_id'])) {
@@ -10,14 +10,14 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 
 // Verifica dados
-if (!isset($_POST['status']) || !isset($_POST['origem'])) {
+if (!isset($_POST['status'])) {
     http_response_code(400);
     echo 'Dados incompletos.';
     exit;
 }
 
 $status     = $_POST['status'];
-$origem     = $_POST['origem'];
+$origem     = 'usuario'; // Força a origem como manual para ações do usuário
 $usuario_id = $_SESSION['usuario_id'];
 
 // Busca o último sensor inserido (para associar o sensor_id)

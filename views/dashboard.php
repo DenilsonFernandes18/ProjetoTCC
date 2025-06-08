@@ -1,16 +1,32 @@
 <?php
 require_once 'proteger.php';
+require_once '../db/conexao.php';
+
+
+$modo_auto_db = false;
+
+$stmt = $con->prepare("SELECT estado FROM modo_automatico WHERE usuario_id = ?");
+$stmt->bind_param("i", $_SESSION['usuario_id']);
+$stmt->execute();
+$stmt->bind_result($estado);
+if ($stmt->fetch()) {
+    $modo_auto_db = (bool)$estado;
+}
+$stmt->close();
+
+
 ?>
 
 <!DOCTYPE html>
 <html lang="pt">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Painel - IoT Irrigação</title>
         <link rel="stylesheet" href="../css/style.css">
         <link rel="icon" href="../img/smartagro.png">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-        
+        <script>window.MODO_AUTO_INICIAL = <?= $modo_auto_db ? 'true' : 'false' ?>;</script>
     </head>
     <body>
         <div style="display: flex;" class="top-bar">
@@ -24,6 +40,7 @@ require_once 'proteger.php';
             <div class="user">
                 <h4>Bem-vindo, <span style="color:rgb(44, 111, 64)"><?php echo $_SESSION['usuario_nome']; ?>!</span></h4>
             </div>
+            
             <h1>Painel de Monitoramento</h1>
             <div class="card-container">
                 <div class="card" id="tempCard">🌡️ Temperatura: 
@@ -51,7 +68,7 @@ require_once 'proteger.php';
             <div class="switch-container">
                 <span class="switch-label">Modo Automático</span>
                 <label class="switch">
-                    <input type="checkbox" id="modoAuto" checked>
+                    <input type="checkbox" id="modoAuto">
                     <span class="slider"></span>
                 </label>
             </div>
@@ -64,7 +81,7 @@ require_once 'proteger.php';
             <div class="modal-conteudo">
                 <span class="fechar" id="btnFecharModal">&times;</span>
                 <!--Inicio Histórico-->
-                <h2>Histórico de Atividades</h2>
+                <h2>Histórico de Actividades</h2>
                 <table>
                     <thead>
                         <tr>
@@ -121,6 +138,16 @@ require_once 'proteger.php';
         <script src="../js/script.js"></script>
         <script src="../js/swal.js"></script>
 
+        <style>
+            /* Estilo para prevenir animação inicial do switch */
+            .switch .slider {
+                transition: none;
+            }
+            .switch.initialized .slider {
+                transition: .4s;
+            }
+        </style>
+
         <?php if (isset($_SESSION['login_success'])): ?>
             <script>
                 Swal.fire({
@@ -172,22 +199,61 @@ require_once 'proteger.php';
                 });
             }
 
-            // Registrar ações ligar e desligar
-            document.getElementById('ligar').addEventListener('click', function () {
-                registrarAcao('ligada');
+            // Função para atualizar o estado dos botões
+            function atualizarEstadoBotoes(modoAutoAtivo) {
+                const btnLigar = document.getElementById('ligar');
+                const btnDesligar = document.getElementById('desligar');
+                
+                btnLigar.disabled = modoAutoAtivo;
+                btnDesligar.disabled = modoAutoAtivo;
+            }
+
+            // Inicialização do modo automático
+            document.addEventListener('DOMContentLoaded', function() {
+                const modoAutoCheckbox = document.getElementById('modoAuto');
+                const switchElement = modoAutoCheckbox.closest('.switch');
+                
+                // Remove a classe init-done (caso exista de um reload)
+                switchElement.classList.remove('init-done');
+                
+                // Define o estado inicial sem animação
+                // Use o valor vindo do PHP como fonte de verdade
+                modoAutoCheckbox.checked = window.MODO_AUTO_INICIAL;
+
+
+                // Atualiza o estado inicial dos botões
+                atualizarEstadoBotoes(modoAutoCheckbox.checked);
+
+                // Força um reflow antes de adicionar a classe que habilita as transições
+                switchElement.offsetHeight;
+
+                // Adiciona a classe que habilita as transições após um pequeno delay
+                requestAnimationFrame(() => {
+                    switchElement.classList.add('init-done');
+                });
+
+                // Atualiza o localStorage e estado dos botões quando o switch mudar
+                modoAutoCheckbox.addEventListener('change', function() {
+                    localStorage.setItem('modoAutomatico', this.checked);
+                    atualizarEstadoBotoes(this.checked);
+                });
             });
 
-            document.getElementById('desligar').addEventListener('click', function () {
-                registrarAcao('desligada'); 
-            });
-
+            // Modificar a função registrarAcao para verificar modo automático
             function registrarAcao(status) {
+                const modoAuto = document.getElementById('modoAuto').checked;
+                
+                // Se modo automático estiver ativo, não registra ação manual
+                if (modoAuto) {
+                    return;
+                }
+
                 fetch("../db/registrar_acao.php", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded"
                     },
-                    body: "status=" + encodeURIComponent(status) + "&origem=manual"
+                    body: "status=" + encodeURIComponent(status) + "&origem=usuario"
                 })
                 .then(response => response.text())
                 .then(data => {
@@ -198,11 +264,28 @@ require_once 'proteger.php';
                 });
             }
 
+            // Registrar ações ligar e desligar
+            document.getElementById('ligar').addEventListener('click', function () {
+                registrarAcao('ligada');
+            });
+
+            document.getElementById('desligar').addEventListener('click', function () {
+                registrarAcao('desligada'); 
+            });
+
             // Loop para registrar modo automático
             setInterval(() => {
                 const modoAuto = document.getElementById('modoAuto').checked;
+                
+                // Se modo automático estiver desligado, não faz nada
+                if (!modoAuto) return;
+                
                 const temperatura = parseFloat(document.getElementById('temp').textContent);
                 const umidade = parseFloat(document.getElementById('umi').textContent);
+
+                // Verifica o estado atual do sistema
+                const statusAtual = document.querySelector('#Historico tr:first-child td:nth-child(3)');
+                const ultimoStatus = statusAtual ? statusAtual.textContent.trim() : null;
 
                 if (!isNaN(temperatura) && !isNaN(umidade)) {
                     fetch("../db/registrar_auto.php", {
@@ -210,17 +293,21 @@ require_once 'proteger.php';
                         headers: {
                             "Content-Type": "application/x-www-form-urlencoded"
                         },
-                        body: `temperatura=${temperatura}&umidade=${umidade}&modo_automatico=${modoAuto}`
+                        body: `temperatura=${temperatura}&umidade=${umidade}&modo_automatico=${modoAuto}&ultimo_status=${ultimoStatus}`
                     })
                     .then(response => response.text())
                     .then(data => {
                         console.log("Automático:", data);
+                        // Atualiza o histórico imediatamente se houver mudança
+                        if (data.includes("registrada")) {
+                            carregarHistorico();
+                        }
                     })
                     .catch(error => {
                         console.error("Erro automático:", error);
                     });
                 }
-            }, 8000); // a cada 10 segundos
+            }, 2000); // Reduzido para 2 segundos
         </script>
     </body>
 </html>

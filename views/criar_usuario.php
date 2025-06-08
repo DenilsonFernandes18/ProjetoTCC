@@ -2,6 +2,7 @@
 require_once '../db/conexao.php';
 session_start();
 
+// Buscar gêneros disponíveis
 $generos = [];
 $result = $con->query("SHOW COLUMNS FROM usuarios LIKE 'genero'");
 if ($result) {
@@ -29,18 +30,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['criar_error'] = "E-mail ou telefone já cadastrado!";
     } else {
         $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
-        $stmt = $con->prepare("INSERT INTO usuarios (nome, email, telefone, genero, senha)VALUES (?, ?, ?, ?, ?)");
+        $stmt = $con->prepare("INSERT INTO usuarios (nome, email, telefone, genero, senha) VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param("sssss", $nome, $email, $telefone, $genero, $senha_hash);
 
-        if ($stmt->execute()) {
+        if ($stmt && $stmt->execute()) {
+            $novo_usuario_id = $con->insert_id;
+
+            // Cria entrada na tabela modo_automatico
+            $stmt2 = $con->prepare("INSERT INTO modo_automatico (usuario_id, estado, updated) VALUES (?, 0, NOW())");
+            if ($stmt2) {
+                $stmt2->bind_param("i", $novo_usuario_id);
+                $stmt2->execute();
+            }
+
             $_SESSION['criar_sucesso'] = "Conta criada com sucesso!";
+            
         } else {
             $_SESSION['criar_error'] = "Erro ao criar usuário.";
         }
     }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -57,19 +67,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <h2>Criar Conta</h2>
         <form method="post" action="criar_usuario.php">
           <div class="txt_field">
-            <input type="text" name="nome" required>
+            <input type="text" name="nome" required autocomplete="name">
             <span></span>
-            <label for="">Nome</label>
+            <label>Nome</label>
           </div>
           <div class="txt_field">
-            <input type="text" name="email" required>
+            <input type="email" name="email" required autocomplete="email">
             <span></span>
-            <label for="">Email</label>
+            <label>E-mail</label>
           </div>
           <div class="txt_field">
-            <input type="text" name="telefone" pattern="\d{9}" title="Insira exatamente 9 dígitos" maxlength="9" required>
+            <input type="text" name="telefone" pattern="\d{9}" title="Insira 9 dígitos" maxlength="9" required>
             <span></span>
-            <label for="">Telefone</label>
+            <label>Telefone</label>
           </div>
           <div class="txt_field ">
             <select name="genero" required>
@@ -82,9 +92,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           </div>
 
           <div class="txt_field">
-            <input type="password" name="senha" required>
+            <input type="password" name="senha" required autocomplete="new-password">
             <span></span>
-            <label for="">Senha</label>
+            <label>Senha</label>
           </div>
           <div class="signup_link">
             Já possui uma conta?<a href="login.php">Entrar</a>

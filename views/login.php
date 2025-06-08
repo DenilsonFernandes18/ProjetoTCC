@@ -46,6 +46,7 @@
 <html lang="pt">
   <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login-SmartAgro</title>
     <link rel="stylesheet" href="../css/style_login.css">
     <link rel="icon" href="../img/smartagro.png">
@@ -56,14 +57,14 @@
         <h2>Login</h2>
         <form method="post" action="login.php">
           <div class="txt_field">
-            <input type="text" name="login" required>
+            <input type="text" name="login" required autocomplete="username">
             <span></span>
-            <label for="">E-mail ou Telefone</label>
+            <label>E-mail ou Telefone</label>
           </div>
           <div class="txt_field">
-            <input type="password" name="senha" required>
+            <input type="password" name="senha" required autocomplete="current-password">
             <span></span>
-            <label for="">Senha</label>
+            <label>Senha</label>
           </div>
           <div class="pass"><a href="altersenha.php">Esqueceu a senha?</a></div>
           <input type="submit" value="Entrar">

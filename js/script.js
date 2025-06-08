@@ -17,15 +17,15 @@ function atualizarSensores() {
       if (temperatura === "--") {
         tempEl.textContent = "--";
         tempEl.classList.add('preto');
-        sensacaoTempEl.textContent = '';
+        sensacaoTempEl.textContent = 'sensação:--';
       } else {
         tempEl.textContent = `${temperatura}°C`;
 
-        if (temperatura > 35) {
+        if (parseFloat(temperatura) > 35) {
           tempEl.classList.add('vermelho');
           sensacaoTempEl.textContent = 'Sensação: Muito quente';
-        } else if (temperatura < 15) {
-          tempEl.classList.add('verde');
+        } else if (parseFloat(temperatura) < 15) {
+          tempEl.classList.add('laranja');
           sensacaoTempEl.textContent = 'Sensação: Frio';
         } else {
           tempEl.classList.add('verde');
@@ -52,9 +52,7 @@ function atualizarSensores() {
     .catch(err => console.error('Erro ao buscar dados:', err));
 }
 
-
-
-// Atualiza imediatamente e depois a cada 1 segundos
+// Atualiza imediatamente e depois a cada 2 segundos
 atualizarSensores();
 setInterval(atualizarSensores, 2000);
 
@@ -78,38 +76,47 @@ window.onclick = (event) => {
   }
 };
 
-
 //Irrigação modo automático
-const modoAutoCheckbox = document.getElementById('modoAuto');
-const modoAutoTexto = document.getElementById('modoAutoTexto');
+document.addEventListener('DOMContentLoaded', function () {
+  const modoAutoCheckbox = document.getElementById('modoAuto');
+  const modoAutoTexto = document.getElementById('modoAutoTexto');
 
-// Função para atualizar visual e salvar no localStorage
-function atualizarModoAutomatico() {
-  const isChecked = modoAutoCheckbox.checked;
-
-  // Atualiza texto e cor
-  modoAutoTexto.textContent = isChecked ? 'ON' : 'OFF';
-  modoAutoTexto.style.color = isChecked ? 'green' : 'red';
-
-  // Salva o estado
-  localStorage.setItem('modoAutomatico', isChecked ? 'true' : 'false');
-}
-
-// Ao carregar a página, restaurar o estado salvo
-document.addEventListener('DOMContentLoaded', () => {
-  const estadoSalvo = localStorage.getItem('modoAutomatico');
-
-  // Se existir estado salvo, aplica
-  if (estadoSalvo !== null) {
-    modoAutoCheckbox.checked = (estadoSalvo === 'true');
+  function atualizarUI(ativo) {
+      modoAutoCheckbox.checked = ativo;
+      modoAutoTexto.textContent = ativo ? 'ON' : 'OFF';
+      modoAutoTexto.style.color = ativo ? 'green' : 'red';
   }
 
-  // Atualiza a interface com base no estado atual
-  atualizarModoAutomatico();
+  // Inicializa estado com valor do PHP
+  atualizarUI(window.MODO_AUTO_INICIAL);
+
+  modoAutoCheckbox.addEventListener('change', () => {
+      const novoEstado = modoAutoCheckbox.checked ? 1 : 0;
+
+      fetch('../db/atualizar_modo_auto.php', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: 'estado=' + novoEstado
+      })
+      .then(res => res.json())
+      .then(data => {
+          if (data.success) {
+              atualizarUI(novoEstado);
+          } else {
+              alert('Erro ao atualizar estado no servidor.');
+              atualizarUI(!modoAutoCheckbox.checked);
+          }
+      })
+      .catch(() => {
+          alert('Erro de rede.');
+          atualizarUI(!modoAutoCheckbox.checked);
+      });
+  });
 });
 
-// Atualiza e salva sempre que mudar
-modoAutoCheckbox.addEventListener('change', atualizarModoAutomatico);
+
 
 
 
